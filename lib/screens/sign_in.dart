@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
             email: emailcontroller.text, password: passcontroller.text);
         print('Sign in');
-        Navigator.pushReplacementNamed(context, Routes.data);
+        Navigator.pushReplacementNamed(context, Routes.homeRoute);
       } on FirebaseAuthException catch (e) {
         print(e.code);
         print(e.message);

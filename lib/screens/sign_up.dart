@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,10 @@ import 'package:order/components/routes_manager.dart';
 import 'package:order/constants/colors.dart';
 import 'package:order/constants/textfieldDecoration.dart';
 import 'package:order/customWidgets/dropdown.dart';
+import 'package:order/main.dart';
+import 'package:order/model/usersData.dart';
 import 'package:order/utilis/snackbar.dart';
+import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -139,7 +143,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   items: dropdownItems,
                   onChanged: (String? newValue) {
                     setState(() {
-                      selectedValue = newValue!;
+                      selectedValue = newValue;
                     });
                   },
                   value: selectedValue,
@@ -252,6 +256,10 @@ class _SignUpPageState extends State<SignUpPage> {
     } else if (password.isEmpty || password.length < 6) {
       showSnackBar("Password must be 6 Characters", context,
           icon: Icons.email, color: Colors.white);
+    } else if (selectedValue == null) {
+      showSnackBar("Select Your Location", context,
+          icon: Icons.place, color: Colors.white);
+      return;
     } else {
       setState(() {
         loading = true;
@@ -261,6 +269,16 @@ class _SignUpPageState extends State<SignUpPage> {
             email: emailcontroller.text, password: passcontroller.text);
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         print('successsssssssss');
+        final docUser =
+            FirebaseFirestore.instance.collection('users data').doc();
+        final user = Users(id: docUser.id, name: email, place: selectedValue);
+        final json = user.tojson();
+        try {
+          await docUser.set(json);
+        } on Exception {
+          print('object');
+        }
+
         Navigator.pushReplacementNamed(context, Routes.loginRoute);
         loading = false;
       } on FirebaseAuthException catch (e) {
@@ -273,11 +291,6 @@ class _SignUpPageState extends State<SignUpPage> {
               "The email address is already in use by another account", context,
               icon: Icons.email, color: Colors.white);
         }
-        // Fluttertoast.showToast(
-        //     msg: "SomeThing Wrong",
-        //     textColor: Colors.white,
-        //     backgroundColor: Colors.grey,
-        //     gravity: ToastGravity.CENTER);
         print(e.message);
       }
     }
