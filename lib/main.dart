@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:order/screens/introduction.dart';
 import 'package:provider/provider.dart';
 
-import 'components/routes_manager.dart';
+import 'services/routes_manager.dart';
 
 class Data with ChangeNotifier {
   String place = '';
@@ -30,14 +31,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: ((context) => Data())),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        onGenerateRoute: RouteGenerator.getRoute,
-        initialRoute: Routes.splashRoute,
-      ),
+          title: 'Flutter Demo',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          onGenerateRoute: RouteGenerator.getRoute,
+          initialRoute: Routes.splashRoute,
+          home: Introduction()),
     );
   }
 }

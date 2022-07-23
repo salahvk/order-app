@@ -1,0 +1,250 @@
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:flutter/material.dart';
+// import 'package:order/constants/colors.dart';
+// import 'package:order/constants/textfieldDecoration.dart';
+// import 'package:order/main.dart';
+// import 'package:order/utilis/snackbar.dart';
+// import 'package:provider/provider.dart';
+
+// import '../services/routes_manager.dart';
+
+// class SignIn extends StatefulWidget {
+//   const SignIn({Key? key}) : super(key: key);
+
+//   @override
+//   State<SignIn> createState() => _SignIN();
+// }
+
+// class _SignIN extends State<SignIn> {
+//   TextEditingController emailcontroller = TextEditingController();
+//   TextEditingController passcontroller = TextEditingController();
+//   bool _isPasswordVisible = false;
+//   String email = "";
+//   String password = "";
+//   bool loading = false;
+//   var focusNode = FocusNode();
+
+//   @override
+//   Widget build(BuildContext context) {
+//     Size size = MediaQuery.of(context).size;
+
+//     return Scaffold(
+//       body: SafeArea(
+//           child: Padding(
+//         padding: const EdgeInsets.all(10.0),
+//         child: Column(
+//           children: [
+//             Row(
+//               children: [
+//                 Container(
+//                   margin: EdgeInsets.only(
+//                       top: size.height / 15, left: size.height / 26),
+//                   child: Text("Sign In",
+//                       style: TextStyle(
+//                           fontSize: size.height / 38.5,
+//                           fontFamily: "Open",
+//                           fontWeight: FontWeight.w600,
+//                           color: incomingCallerNameColor)),
+//                 ),
+//               ],
+//             ),
+//             Container(
+//               margin: EdgeInsets.only(top: size.height / 20),
+//               height: size.height / 17,
+//               width: size.width / 1.2,
+//               child: TextField(
+//                 keyboardType: TextInputType.emailAddress,
+//                 controller: emailcontroller,
+//                 onSubmitted: (value) {
+//                   FocusScope.of(context).requestFocus(focusNode);
+//                 },
+//                 onChanged: (value) {},
+//                 style: TextStyle(
+//                     color: readRowTextColor,
+//                     fontFamily: "Open",
+//                     fontWeight: FontWeight.w600,
+//                     fontSize: size.height / 54),
+//                 decoration: searchBoxDecoration.copyWith(
+//                   hintText: "Email",
+//                 ),
+//                 cursorColor: readRowTextColor,
+//               ),
+//             ),
+//             Container(
+//               margin: EdgeInsets.only(top: size.height / 30),
+//               height: size.height / 17,
+//               width: size.width / 1.2,
+//               child: TextField(
+//                 focusNode: focusNode,
+//                 obscureText: !_isPasswordVisible,
+//                 controller: passcontroller,
+//                 onChanged: (value) {
+//                   setState(() {
+//                     password = value;
+//                   });
+//                 },
+//                 style: TextStyle(
+//                     color: readRowTextColor,
+//                     fontFamily: "Open",
+//                     fontWeight: FontWeight.w600,
+//                     fontSize: size.height / 54),
+//                 decoration: searchBoxDecoration.copyWith(
+//                   hintText: "Password",
+//                   suffixIcon: IconButton(
+//                       icon: Icon(_isPasswordVisible
+//                           ? Icons.visibility_off_outlined
+//                           : Icons.visibility_outlined),
+//                       onPressed: () {
+//                         setState(() {
+//                           _isPasswordVisible = !_isPasswordVisible;
+//                         });
+//                       }),
+//                 ),
+//                 cursorColor: readRowTextColor,
+//               ),
+//             ),
+//             Container(
+//               margin: EdgeInsets.only(top: size.height / 50),
+//               child: Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                 children: const [Text('Remember Me'), Text('Forgot Password')],
+//               ),
+//             ),
+//             GestureDetector(
+//               onTap: () {
+//                 FocusManager.instance.primaryFocus?.unfocus();
+//                 onsubmitted();
+//               },
+//               child: Container(
+//                 margin: EdgeInsets.only(top: size.height / 25),
+//                 height: size.height / 17,
+//                 width: size.width / 1.2,
+//                 decoration: BoxDecoration(
+//                     color: Colors.blue,
+//                     border: Border.all(color: borderColor, width: 1),
+//                     borderRadius: const BorderRadius.all(Radius.circular(28))),
+//                 child: Center(
+//                   child: loading == false
+//                       ? Text("Sign In",
+//                           style: TextStyle(
+//                               fontSize: size.height / 51,
+//                               fontFamily: "Open",
+//                               fontWeight: FontWeight.w600,
+//                               color: Colors.white))
+//                       : Container(
+//                           child: const CircularProgressIndicator(
+//                             backgroundColor: fabColor,
+//                             valueColor:
+//                                 AlwaysStoppedAnimation<Color>(Colors.white),
+//                           ),
+//                         ),
+//                 ),
+//               ),
+//             ),
+//             const Spacer(),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 const Text('Dont have an account? '),
+//                 GestureDetector(
+//                   child: const Text(
+//                     'Create new one',
+//                     style: TextStyle(color: Colors.blue),
+//                   ),
+//                   onTap: () {
+//                     Navigator.pushReplacementNamed(context, Routes.signUpRoute);
+//                   },
+//                 )
+//               ],
+//             ),
+//             const SizedBox(
+//               height: 20,
+//             )
+//           ],
+//         ),
+//       )),
+//     );
+//   }
+
+//   Future onsubmitted() async {
+//     email = emailcontroller.text.trim();
+//     password = passcontroller.text.trim();
+//     print(email);
+//     bool emailValid = RegExp(
+//             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+//         .hasMatch(email);
+//     print('$emailValid emailValid');
+
+//     if (email.isEmpty || email.length < 4 || emailValid != true) {
+//       showSnackBar("Enter a valid Email!", context,
+//           icon: Icons.email, color: Colors.white);
+//     } else if (password.isEmpty || password.length < 6) {
+//       showSnackBar("Password must be 6 Characters!", context,
+//           icon: Icons.email, color: Colors.white);
+//     } else {
+//       setState(() {
+//         loading = true;
+//       });
+//       try {
+//         await FirebaseAuth.instance.signInWithEmailAndPassword(
+//             email: emailcontroller.text, password: passcontroller.text);
+//         print('Sign in');
+//         getUserDetails();
+//         Navigator.pushReplacementNamed(context, Routes.shopList);
+//       } on FirebaseAuthException catch (e) {
+//         print(e.code);
+//         print(e.message);
+//         if (e.code == 'wrong-password') {
+//           // print(
+//           //     'The password is invalid or the user does not have a password.');
+//           showSnackBar("The password is invalid", context,
+//               icon: Icons.email, color: Colors.white);
+//         } else if (e.code == 'email-already-in-use') {
+//           print('The account already exists for that email.');
+//         } else if (e.code == 'user-not-found') {
+//           showSnackBar("There is no user in this name", context,
+//               icon: Icons.email, color: Colors.white);
+//         } else if (e.code == 'too-many-requests') {
+//           showSnackBar("Too many requests.Try again later", context,
+//               icon: Icons.email, color: Colors.white);
+//         } else if (e.code == 'network-request-failed') {
+//           showSnackBar(
+//               "interrupted connection ! Please check your network", context,
+//               icon: Icons.email, color: Colors.white);
+//         } else if (e.code == 'unknown') {
+//           showSnackBar("Please check your connection", context,
+//               icon: Icons.email, color: Colors.white);
+//         }
+//         setState(() {
+//           loading = false;
+//         });
+//         // Fluttertoast.showToast(
+//         //     msg: "SomeThing Wrong",
+//         //     textColor: Colors.white,
+//         //     backgroundColor: Colors.grey,
+//         //     gravity: ToastGravity.CENTER);
+//         // print(e);
+//       }
+//     }
+//   }
+
+//   getUserDetails() {
+//     final provider = Provider.of<Data>(context, listen: false);
+//     final user = FirebaseAuth.instance.currentUser;
+//     print(user?.email);
+//     print('Login name');
+//     FirebaseFirestore.instance
+//         .collection("users data")
+//         .where("userName", isEqualTo: "${user?.email}")
+//         .get()
+//         .then((value) {
+//       value.docs.forEach((result) {
+//         print(result.data().values.elementAt(0));
+//         String newname = result.data().values.elementAt(0);
+//         // provider.changeShopName(newname);
+//       });
+//       print('Got it');
+//     });
+//   }
+// }

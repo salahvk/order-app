@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:order/animation/animation.dart';
-import 'package:order/components/routes_manager.dart';
+import 'package:order/services/routes_manager.dart';
 import 'package:order/main.dart';
 import 'package:order/model/shops.dart';
 import 'package:provider/provider.dart';
@@ -101,9 +101,15 @@ class _ShopListState extends State<ShopList> {
     );
   }
 
-  Stream<List<Shops>> readShops() => FirebaseFirestore.instance
-      .collection('$selectedPlace')
-      .snapshots()
-      .map((snapshot) =>
-          snapshot.docs.map((doc) => Shops.fromJson(doc.data())).toList());
+  Stream<List<Shops>> readShops() {
+    final provider = Provider.of<Data>(context, listen: false);
+    return FirebaseFirestore.instance
+        .collection('Places')
+        .doc('${provider.place}')
+        .collection('shopNames')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => Shops.fromJson(doc.get('shopName')))
+            .toList());
+  }
 }
