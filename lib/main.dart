@@ -12,6 +12,13 @@ class Data with ChangeNotifier {
     print(place);
     notifyListeners();
   }
+
+  String shopName = '';
+  void changeShop(String newShop) {
+    shopName = newShop;
+    print(shopName);
+    notifyListeners();
+  }
 }
 
 Future main() async {
@@ -31,14 +38,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: ((context) => Data())),
       ],
       child: MaterialApp(
-          title: 'Flutter Demo',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          onGenerateRoute: RouteGenerator.getRoute,
-          initialRoute: Routes.splashRoute,
-          home: Introduction()),
+        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        onGenerateRoute: RouteGenerator.getRoute,
+        initialRoute: Routes.splashRoute,
+      ),
     );
   }
 }

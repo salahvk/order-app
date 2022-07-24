@@ -346,20 +346,20 @@ class _SignUpState extends State<SignUps> {
   CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('places');
   Future<void> getData() async {
-    // Get docs from collection reference
     QuerySnapshot querySnapshot = await collectionRef.get();
-    // Get data from docs and convert map to List
+
     placeNames = querySnapshot.docs.map((doc) => doc.get('place')).toList();
     print(placeNames);
     return;
-    final firstlis = placeNames.first;
-    // jsonDecode();
-    final newjson = jsonEncode(firstlis);
-    print(newjson);
-    print(jsonDecode(newjson));
-    final s = jsonDecode(newjson);
-    print(s['place']);
   }
+
+  // final firstlis = placeNames.first;
+  // // jsonDecode();
+  // final newjson = jsonEncode(firstlis);
+  // print(newjson);
+  // print(jsonDecode(newjson));
+  // final s = jsonDecode(newjson);
+  // print(s['place']);
 }
 
 class CustomClass {

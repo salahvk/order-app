@@ -26,8 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
         getUserDetails();
         Timer(Duration(seconds: 2), () {
           print("This code executes after 2 seconds");
-          // Navigator.pushNamedAndRemoveUntil(
-          //     context, Routes.homePage, (route) => false);
+          Navigator.pushNamedAndRemoveUntil(
+              context, Routes.shopList, (route) => false);
         });
       }
     });

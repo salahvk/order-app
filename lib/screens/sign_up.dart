@@ -10,6 +10,7 @@ import 'package:order/components/color_manager.dart';
 import 'package:order/components/style_manager.dart';
 import 'package:order/constants/colors.dart';
 import 'package:order/model/shops.dart';
+import 'package:order/model/usersData.dart';
 import 'package:order/services/routes_manager.dart';
 import 'package:order/utilis/snackbar.dart';
 
@@ -31,7 +32,7 @@ class _SignUpState extends State<SignUp> {
 
   String email = "";
   String password = "";
-  String shopName = "";
+  List<dynamic> placeNames = [];
   String pin = "";
   String? selectedValue;
 
@@ -43,6 +44,13 @@ class _SignUpState extends State<SignUp> {
   List<String?> pNames = [];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     void setPsswordVisibility() {
@@ -52,11 +60,11 @@ class _SignUpState extends State<SignUp> {
     }
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 226, 221, 221),
+      backgroundColor: const Color.fromARGB(255, 226, 221, 221),
       body: SingleChildScrollView(
         child: Container(
           height: size.height,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
@@ -148,56 +156,7 @@ class _SignUpState extends State<SignUp> {
                       )),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: size.height * 0.02,
-                    ),
-                    child: Container(
-                      height: size.height * 0.06,
-                      decoration: BoxDecoration(
-                          color: ColorManager.whiteText,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                          child: Padding(
-                        padding: EdgeInsets.only(
-                            left: 8.0, right: size.height * 0.01),
-                        child: TextField(
-                          keyboardType: TextInputType.number,
-                          maxLength: 6,
-                          onSubmitted: (value) {
-                            FocusScope.of(context).requestFocus(focusNode);
-                          },
-                          controller: pincontroller,
-                          onChanged: (value) async {
-                            if (value.length == 6) {
-                              FocusManager.instance.primaryFocus?.unfocus();
-                              // getPinCode(value: value);
-                            }
-                          },
-                          decoration: InputDecoration(
-                              suffix: pinLoading
-                                  ? SizedBox(
-                                      width: 30,
-                                      height: 30,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Icon(
-                                      tPin
-                                          ? Icons.done
-                                          : FontAwesomeIcons.xmark,
-                                      color: tPin ? Colors.green : Colors.red,
-                                    ),
-                              counterText: '',
-                              border: InputBorder.none,
-                              hintText: 'Enter your Pincode',
-                              hintStyle: getRegularStyle(
-                                  color: ColorManager.grayDark, fontSize: 12)),
-                        ),
-                      )),
-                    ),
-                  ),
+
                   Padding(
                     padding: EdgeInsets.only(bottom: size.height * 0.02),
                     child: Container(
@@ -215,7 +174,7 @@ class _SignUpState extends State<SignUp> {
                                     color: ColorManager.grayDark,
                                     fontSize: 12)),
                             dropdownMaxHeight: size.height * .3,
-                            items: pNames
+                            items: placeNames
                                 .map((item) => DropdownMenuItem<String>(
                                       value: item,
                                       child: Text(
@@ -279,7 +238,7 @@ class _SignUpState extends State<SignUp> {
                       child: new Container(
                           margin:
                               const EdgeInsets.only(left: 10.0, right: 15.0),
-                          child: Divider(
+                          child: const Divider(
                             color: Colors.black,
                             height: 50,
                           )),
@@ -290,7 +249,7 @@ class _SignUpState extends State<SignUp> {
                       child: new Container(
                           margin:
                               const EdgeInsets.only(left: 15.0, right: 10.0),
-                          child: Divider(
+                          child: const Divider(
                             color: Colors.black,
                             height: 50,
                           )),
@@ -308,8 +267,8 @@ class _SignUpState extends State<SignUp> {
                             child: Container(
                               width: size.width * 0.2,
                               height: size.height * 0.06,
-                              decoration: BoxDecoration(),
-                              child: Center(
+                              decoration: const BoxDecoration(),
+                              child: const Center(
                                   child: FaIcon(
                                 FontAwesomeIcons.google,
                                 color: ColorManager.errorRed,
@@ -327,8 +286,8 @@ class _SignUpState extends State<SignUp> {
                             child: Container(
                               width: size.width * 0.2,
                               height: size.height * 0.06,
-                              decoration: BoxDecoration(),
-                              child: Center(
+                              decoration: const BoxDecoration(),
+                              child: const Center(
                                   child: FaIcon(
                                 FontAwesomeIcons.apple,
                               )),
@@ -345,8 +304,8 @@ class _SignUpState extends State<SignUp> {
                             child: Container(
                               width: size.width * 0.2,
                               height: size.height * 0.06,
-                              decoration: BoxDecoration(),
-                              child: Center(
+                              decoration: const BoxDecoration(),
+                              child: const Center(
                                   child: FaIcon(
                                 FontAwesomeIcons.facebook,
                                 color: Colors.blue,
@@ -399,10 +358,10 @@ class _SignUpState extends State<SignUp> {
   Future onsubmitted() async {
     email = emailcontroller.text.trim();
     password = passcontroller.text.trim();
-    shopName = shopcontroller.text.trim();
+
     pin = pincontroller.text.trim();
     print(email);
-    print(shopName);
+
     print(pin);
 
     bool emailValid = RegExp(
@@ -416,83 +375,33 @@ class _SignUpState extends State<SignUp> {
     } else if (password.isEmpty || password.length < 6) {
       showSnackBar("Password must be 6 Characters", context,
           icon: Icons.email, color: Colors.white);
-    } else if (pin.isEmpty) {
-      showSnackBar("Enter Your Location Pin", context,
-          icon: Icons.place, color: Colors.white);
-      return;
     } else if (selectedValue == null) {
       showSnackBar("Select Your Location", context,
           icon: Icons.place, color: Colors.white);
-      return;
-    } else if (shopName.isEmpty) {
-      showSnackBar("Enter Your shop name", context,
-          icon: Icons.shop, color: Colors.white);
       return;
     } else {
       setState(() {
         loading = true;
       });
 
-      if (uStatus == false) {
-        showSnackBar("Enter a valid Pin", context,
-            icon: Icons.shop, color: Colors.white);
-        setState(() {
-          loading = false;
-        });
-        return;
-      }
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: emailcontroller.text, password: passcontroller.text);
         showSnackBar("Account created Successfully", context,
             icon: Icons.email, color: Colors.white);
-        print('succes');
+        print('success');
+
         final authUser = FirebaseAuth.instance.currentUser;
-        print("this is  $authUser");
+
+        // * Enter data into firestore
         final docUser = FirebaseFirestore.instance
-            .collection('admins data')
+            .collection('users data')
             .doc(authUser?.uid);
-        // final user = Shop(
-        //   id: docUser.id,
-        //   name: email,
-        //   pin: pin,
-        //   shopName: shopName,
-        //   place: selectedValue,
-        // );
-        // final json = user.tojson();
-        print(docUser.id);
-
-        // try {
-        //   await docUser.set(json);
-        // } on Exception {
-        //   print('object');
-        // }
-
-        // * place field creation start
-
-        final docPlace = FirebaseFirestore.instance
-            .collection('places')
-            .doc("$selectedValue");
-        final place = {"place": "$selectedValue"};
-        print(docPlace.id);
-        final docId = docPlace.id;
-
+        final user =
+            Users(id: authUser!.uid, name: email, place: selectedValue);
+        final json = user.tojson();
         try {
-          await docPlace.set(place);
-        } on Exception {
-          print('object');
-        }
-
-        final docShop = FirebaseFirestore.instance
-            .collection('places')
-            .doc(docId)
-            .collection('shopNames')
-            .doc();
-
-        final shopNames = {"shopName": "$shopName"};
-        // final docShopId = docShop.id;
-        try {
-          await docShop.set(shopNames);
+          await docUser.set(json);
         } on Exception {
           print('object');
         }
@@ -515,64 +424,13 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  // getPinCode({required String value}) async {
-  //   setState(() {
-  //     pNames = [];
-  //     selectedValue = null;
-  //     pinLoading = true;
-  //   });
-  //   print('Pin entered');
+  CollectionReference collectionRef =
+      FirebaseFirestore.instance.collection('places');
+  Future<void> getData() async {
+    QuerySnapshot querySnapshot = await collectionRef.get();
 
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse('https://api.postalpincode.in/pincode/$value'),
-  //     );
-  //     print(response.body);
-  //     print(response.statusCode);
-
-  //     // * Status code 200
-  //     if (response.statusCode == 200) {
-  //       var json = jsonDecode(response.body);
-  //       if (json != null) {
-  //         json.forEach((element) {
-  //           final pin = PinNo.fromJson(element);
-  //           print(pin.status);
-  //           print(pin.postOffice?.map((e) => e.name));
-
-  //           print(pin.message);
-  //           if (pin.status == 'Success') {
-  //             pNames = pin.postOffice!.map((e) => e.name).toList();
-  //             setState(() {
-  //               pinLoading = false;
-  //               tPin = true;
-  //             });
-  //           } else {
-  //             showSnackBar("Incorrect Pin", context,
-  //                 icon: Icons.pin, color: Colors.white);
-  //             setState(() {
-  //               pinLoading = false;
-  //               tPin = false;
-  //             });
-  //           }
-  //         });
-  //       } else {
-  //         print('Something bad happen');
-  //       }
-  //     } else {
-  //       print('Something Wrong');
-  //       setState(() {
-  //         pinLoading = false;
-  //       });
-  //       showSnackBar("Incorrect Pin", context,
-  //           icon: Icons.pin, color: Colors.white);
-  //     }
-  //   } on Exception catch (e) {
-  //     print(e);
-  //     setState(() {
-  //       pinLoading = false;
-  //     });
-  //     showSnackBar("Incorrect Pin", context,
-  //         icon: Icons.pin, color: Colors.white);
-  //   }
-  // }
+    placeNames = querySnapshot.docs.map((doc) => doc.get('place')).toList();
+    print(placeNames);
+    return;
+  }
 }

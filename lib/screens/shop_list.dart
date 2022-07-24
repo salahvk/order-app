@@ -3,13 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:order/animation/animation.dart';
+import 'package:order/components/color_manager.dart';
+import 'package:order/components/style_manager.dart';
 import 'package:order/services/routes_manager.dart';
 import 'package:order/main.dart';
 import 'package:order/model/shops.dart';
 import 'package:provider/provider.dart';
 
 class ShopList extends StatefulWidget {
-  ShopList({Key? key}) : super(key: key);
+  const ShopList({Key? key}) : super(key: key);
 
   @override
   State<ShopList> createState() => _ShopListState();
@@ -17,6 +19,7 @@ class ShopList extends StatefulWidget {
 
 class _ShopListState extends State<ShopList> {
   String selectedPlace = '';
+  String? shopName;
   final storage = FirebaseStorage.instance;
   final storageRef = FirebaseStorage.instance.ref();
 
@@ -26,6 +29,7 @@ class _ShopListState extends State<ShopList> {
     // TODO: implement initState
     super.initState();
     selectedPlace = provider.place;
+
     print('vanno');
     print(selectedPlace);
   }
@@ -34,6 +38,7 @@ class _ShopListState extends State<ShopList> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final user = FirebaseAuth.instance.currentUser!;
+    final provider = Provider.of<Data>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -45,8 +50,9 @@ class _ShopListState extends State<ShopList> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
                 onPressed: () {
+                  Navigator.pushReplacementNamed(context, Routes.introduction);
                   FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacementNamed(context, Routes.homeRoute);
+                  provider.place = '';
                 },
                 child: const Text('Log out')),
           )
@@ -75,16 +81,31 @@ class _ShopListState extends State<ShopList> {
                     return FadeCustomAnimation(
                       delay: 0.001,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
-                        child: Container(
-                          // width: 300,
-                          height: size.height / 10,
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              border: Border.all(
-                                  color: Colors.grey.shade300, width: 2),
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Text(name![index]),
+                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                        child: InkWell(
+                          onTap: () {
+                            final provider =
+                                Provider.of<Data>(context, listen: false);
+                            Navigator.of(context).pushNamed(Routes.homePage);
+                            provider.shopName = name![index];
+                            shopName = name[index];
+                            createChat();
+                          },
+                          child: Container(
+                            // width: 300,
+                            height: size.height / 10,
+                            decoration: BoxDecoration(
+                                // color: Colors.red,
+                                border: Border.all(
+                                    color: Colors.grey.shade300, width: 2),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Center(
+                              child: Text(name![index],
+                                  style: getBoldtStyle(
+                                      color: ColorManager.background,
+                                      fontSize: 20)),
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -103,13 +124,39 @@ class _ShopListState extends State<ShopList> {
 
   Stream<List<Shops>> readShops() {
     final provider = Provider.of<Data>(context, listen: false);
-    return FirebaseFirestore.instance
-        .collection('Places')
-        .doc('${provider.place}')
+    // print(FirebaseFirestore.instance.collection('places').doc('Naderi').);
+    final data = FirebaseFirestore.instance
+        .collection('places')
+        .doc(provider.place)
         .collection('shopNames')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Shops.fromJson(doc.get('shopName')))
-            .toList());
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Shops.fromJson(doc.data())).toList());
+
+    print('Kingdom');
+    print(data);
+    return data;
+  }
+
+  createChat() async {
+    // final provider = Provider.of<Data>(context, listen: false);
+    final user = FirebaseAuth.instance.currentUser;
+    final docMsg = FirebaseFirestore.instance
+        .collection('places')
+        .doc(selectedPlace)
+        .collection('shopNames')
+        .doc(shopName)
+        .collection('rooms')
+        .doc(user?.uid)
+        .collection('messages')
+        .doc();
+
+    final text = {"text": "Hi"};
+
+    try {
+      await docMsg.set(text);
+    } on Exception {
+      print('object');
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -35,11 +36,11 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 226, 221, 221),
+      backgroundColor: const Color.fromARGB(255, 226, 221, 221),
       body: SingleChildScrollView(
         child: Container(
           height: size.height,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomCenter,
@@ -146,6 +147,7 @@ class _SignInState extends State<SignIn> {
                   GestureDetector(
                     onTap: () {
                       FocusManager.instance.primaryFocus?.unfocus();
+
                       onsubmitted();
                     },
                     child: Container(
@@ -178,10 +180,10 @@ class _SignInState extends State<SignIn> {
                   ),
                   Row(children: <Widget>[
                     Expanded(
-                      child: new Container(
+                      child: Container(
                           margin:
                               const EdgeInsets.only(left: 10.0, right: 15.0),
-                          child: Divider(
+                          child: const Divider(
                             color: Colors.black,
                             height: 50,
                           )),
@@ -189,10 +191,10 @@ class _SignInState extends State<SignIn> {
                     Text("Or continue with",
                         style: getRegularStyle(color: ColorManager.grayDark)),
                     Expanded(
-                      child: new Container(
+                      child: Container(
                           margin:
                               const EdgeInsets.only(left: 15.0, right: 10.0),
-                          child: Divider(
+                          child: const Divider(
                             color: Colors.black,
                             height: 50,
                           )),
@@ -210,8 +212,8 @@ class _SignInState extends State<SignIn> {
                             child: Container(
                               width: size.width * 0.2,
                               height: size.height * 0.06,
-                              decoration: BoxDecoration(),
-                              child: Center(
+                              decoration: const BoxDecoration(),
+                              child: const Center(
                                   child: FaIcon(
                                 FontAwesomeIcons.google,
                                 color: ColorManager.errorRed,
@@ -229,8 +231,8 @@ class _SignInState extends State<SignIn> {
                             child: Container(
                               width: size.width * 0.2,
                               height: size.height * 0.06,
-                              decoration: BoxDecoration(),
-                              child: Center(
+                              decoration: const BoxDecoration(),
+                              child: const Center(
                                   child: FaIcon(
                                 FontAwesomeIcons.apple,
                               )),
@@ -247,8 +249,8 @@ class _SignInState extends State<SignIn> {
                             child: Container(
                               width: size.width * 0.2,
                               height: size.height * 0.06,
-                              decoration: BoxDecoration(),
-                              child: Center(
+                              decoration: const BoxDecoration(),
+                              child: const Center(
                                   child: FaIcon(
                                 FontAwesomeIcons.facebook,
                                 color: Colors.blue,
@@ -324,12 +326,13 @@ class _SignInState extends State<SignIn> {
             email: emailcontroller.text, password: passcontroller.text);
         print('Sign in');
         // getAdminDetails();
+        getUserDetails();
         Timer(const Duration(seconds: 2), () {
           print('How many');
           Navigator.pushNamedAndRemoveUntil(
-              context, Routes.homePage, (route) => false);
+              context, Routes.shopList, (route) => false);
         });
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 2), () {
           print('second');
         });
       } on FirebaseAuthException catch (e) {
@@ -364,22 +367,27 @@ class _SignInState extends State<SignIn> {
   }
 
   //* on submitted function
-  // getAdminDetails() {
-  //   final provider = Provider.of<Data>(context, listen: false);
-  //   final user = FirebaseAuth.instance.currentUser;
-  //   print(user?.email);
-  //   print('Login name');
-  //   FirebaseFirestore.instance
-  //       .collection("admins data")
-  //       .where("name", isEqualTo: "${user?.email}")
-  //       .get()
-  //       .then((value) {
-  //     value.docs.forEach((result) {
-  //       print(result.data().values.elementAt(2));
-  //       String newname = result.data().values.elementAt(2);
-  //       provider.changeShopName(newname);
-  //     });
-  //     print('Got it');
-  //   });
-  // }
+  getUserDetails() {
+    final provider = Provider.of<Data>(context, listen: false);
+    final user = FirebaseAuth.instance.currentUser;
+    print(user?.email);
+    print('Login name');
+
+    FirebaseFirestore.instance.collection("users data").doc(user?.uid).get()
+        // .where("userName", isEqualTo: "${user?.email}")
+        // .get()
+        .then((value) {
+      value.data()!.values.elementAt(0);
+      print(value.data()!.values.elementAt(0));
+      final userPlace = value.data()!.values.elementAt(0);
+      provider.changePlace(userPlace);
+
+      //  .forEach((result) {
+      //   print(result.data().values.elementAt(0));
+      //   String newname = result.data().values.elementAt(0);
+      //   // provider.changeShopName(newname);
+      // });
+      print('Got it');
+    });
+  }
 }

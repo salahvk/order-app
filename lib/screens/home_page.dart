@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:order/components/color_manager.dart';
 import 'package:order/main.dart';
+import 'package:order/dummy%20data%20old/chat_screen_old.dart';
 import 'package:order/screens/chat_screen.dart';
 import 'package:order/screens/delivery.dart';
 import 'package:order/screens/offerPage.dart';
@@ -22,7 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  List<Widget> _screens = [OfferPage(), ChatScreen(), Delivery(), Receipt()];
+  List<Widget> _screens = [OfferPage(), Delivery(), Receipt()];
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<Data>(context, listen: false);
@@ -35,13 +36,26 @@ class _HomePageState extends State<HomePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                  Navigator.pushReplacementNamed(context, Routes.introduction);
-                  final provider = Provider.of<Data>(context, listen: false);
-                },
-                child: const Text('Log out')),
+            child: Row(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+                        return ChatScreen();
+                      }));
+                    },
+                    icon: Icon(Icons.message)),
+                ElevatedButton(
+                    onPressed: () {
+                      FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacementNamed(
+                          context, Routes.introduction);
+                      final provider =
+                          Provider.of<Data>(context, listen: false);
+                    },
+                    child: const Text('Log out')),
+              ],
+            ),
           )
         ],
       ),
@@ -59,10 +73,6 @@ class _HomePageState extends State<HomePage> {
           GButton(
             icon: Icons.home,
             text: 'Home',
-          ),
-          GButton(
-            icon: Icons.chat_bubble,
-            text: 'Chat',
           ),
           GButton(
             icon: Icons.delivery_dining,
