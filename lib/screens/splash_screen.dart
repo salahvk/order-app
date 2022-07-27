@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
             context, Routes.introduction, (route) => false);
       } else {
         getUserDetails();
-        Timer(Duration(seconds: 2), () {
+        Timer(const Duration(seconds: 2), () {
           print("This code executes after 2 seconds");
           Navigator.pushNamedAndRemoveUntil(
               context, Routes.shopList, (route) => false);
@@ -36,19 +37,22 @@ class _SplashScreenState extends State<SplashScreen> {
   getUserDetails() {
     final provider = Provider.of<Data>(context, listen: false);
     final user = FirebaseAuth.instance.currentUser;
+    log('Get user details');
     print(user?.email);
     print('Login name');
+
     FirebaseFirestore.instance
         .collection("users data")
-        .where("userName", isEqualTo: "${user?.email}")
+        .doc(user?.uid)
         .get()
         .then((value) {
-      value.docs.forEach((result) {
-        print(result.data().values.elementAt(2));
-        String newname = result.data().values.elementAt(2);
-        // provider.changeShopName(newname);
-      });
-      print('Got it');
+      final userPlace = value.get('place');
+      final userName = value.get('name');
+      print('is this the place $userPlace ?');
+      provider.changePlace(userPlace);
+      print('is this the name $userName ?');
+      provider.changeName(userName);
+      print('user place and name getting');
     });
   }
 

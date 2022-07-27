@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -112,8 +111,8 @@ class Introduction extends StatelessWidget {
                                 ),
                               ),
                               onTap: () {
-                                // Navigator.pushNamed(
-                                //     context, Routes.phoneNumber);
+                                Navigator.pushNamed(
+                                    context, Routes.phoneNumber);
                               },
                             ),
                           ),

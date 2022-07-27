@@ -1,15 +1,12 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:order/components/color_manager.dart';
 import 'package:order/components/style_manager.dart';
 import 'package:order/constants/colors.dart';
-import 'package:order/model/shops.dart';
 import 'package:order/model/usersData.dart';
 import 'package:order/services/routes_manager.dart';
 import 'package:order/utilis/snackbar.dart';
@@ -24,7 +21,7 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passcontroller = TextEditingController();
-  TextEditingController pincontroller = TextEditingController();
+  TextEditingController namecontroller = TextEditingController();
   TextEditingController shopcontroller = TextEditingController();
 
   var focusNode = FocusNode();
@@ -33,7 +30,7 @@ class _SignUpState extends State<SignUp> {
   String email = "";
   String password = "";
   List<dynamic> placeNames = [];
-  String pin = "";
+  String name = "";
   String? selectedValue;
 
   bool loading = false;
@@ -109,6 +106,7 @@ class _SignUpState extends State<SignUp> {
                               FocusScope.of(context).requestFocus(focusNode);
                             },
                             onChanged: (value) {},
+                            keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Enter your Email',
@@ -156,6 +154,38 @@ class _SignUpState extends State<SignUp> {
                       )),
                     ),
                   ),
+
+                  // ? Your name field start
+                  Padding(
+                    padding: EdgeInsets.only(bottom: size.height * 0.02),
+                    child: Container(
+                      height: size.height * 0.06,
+                      decoration: BoxDecoration(
+                          color: ColorManager.whiteText,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TextField(
+                            controller: namecontroller,
+                            keyboardType: TextInputType.name,
+                            onSubmitted: (value) {
+                              FocusScope.of(context).requestFocus(focusNode);
+                            },
+                            onChanged: (value) {},
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Enter your name to display',
+                                hintStyle: getRegularStyle(
+                                    color: ColorManager.grayDark,
+                                    fontSize: 12)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+// ? Your name field end
 
                   Padding(
                     padding: EdgeInsets.only(bottom: size.height * 0.02),
@@ -358,11 +388,8 @@ class _SignUpState extends State<SignUp> {
   Future onsubmitted() async {
     email = emailcontroller.text.trim();
     password = passcontroller.text.trim();
-
-    pin = pincontroller.text.trim();
-    print(email);
-
-    print(pin);
+    name = namecontroller.text;
+    print("On submit function initiated");
 
     bool emailValid = RegExp(
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -378,6 +405,10 @@ class _SignUpState extends State<SignUp> {
     } else if (selectedValue == null) {
       showSnackBar("Select Your Location", context,
           icon: Icons.place, color: Colors.white);
+      return;
+    } else if (name.length < 0) {
+      showSnackBar("Enter your name", context,
+          icon: Icons.person, color: Colors.white);
       return;
     } else {
       setState(() {
@@ -397,13 +428,13 @@ class _SignUpState extends State<SignUp> {
         final docUser = FirebaseFirestore.instance
             .collection('users data')
             .doc(authUser?.uid);
-        final user =
-            Users(id: authUser!.uid, name: email, place: selectedValue);
+        final user = Users(
+            email: email, id: authUser!.uid, name: name, place: selectedValue);
         final json = user.tojson();
         try {
           await docUser.set(json);
         } on Exception {
-          print('object');
+          print('Some exception occured');
         }
 
         Navigator.pushReplacementNamed(context, Routes.signInRoute);

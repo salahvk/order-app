@@ -1,15 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:order/components/color_manager.dart';
 import 'package:order/main.dart';
-import 'package:order/dummy%20data%20old/chat_screen_old.dart';
 import 'package:order/screens/chat_screen.dart';
 import 'package:order/screens/delivery.dart';
 import 'package:order/screens/offerPage.dart';
 import 'package:order/screens/receipt.dart';
-import 'package:order/services/routes_manager.dart';
 
 import 'package:provider/provider.dart';
 
@@ -30,12 +28,20 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: [Color(0xff11998E), Color(0xff38EF7D)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight)),
+        ),
+        elevation: 0,
         title: Text('${user?.email}. '),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 15.0),
             child: Row(
               children: [
                 IconButton(
@@ -44,16 +50,15 @@ class _HomePageState extends State<HomePage> {
                         return ChatScreen();
                       }));
                     },
-                    icon: Icon(Icons.message)),
-                ElevatedButton(
-                    onPressed: () {
-                      FirebaseAuth.instance.signOut();
-                      Navigator.pushReplacementNamed(
-                          context, Routes.introduction);
-                      final provider =
-                          Provider.of<Data>(context, listen: false);
-                    },
-                    child: const Text('Log out')),
+                    icon: Icon(FontAwesomeIcons.message)),
+                // IconButton(
+                //     onPressed: () {
+                //       FirebaseAuth.instance.signOut();
+                //       Navigator.pushReplacementNamed(
+                //           context, Routes.introduction);
+
+                //     },
+                //     icon: Icon(Icons.logout)),
               ],
             ),
           )

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.order">
    <application
-        android:label="order"
+        android:label="Order App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

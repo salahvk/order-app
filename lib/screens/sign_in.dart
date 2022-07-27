@@ -1,11 +1,9 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:order/components/color_manager.dart';
 import 'package:order/components/style_manager.dart';
@@ -370,24 +368,22 @@ class _SignInState extends State<SignIn> {
   getUserDetails() {
     final provider = Provider.of<Data>(context, listen: false);
     final user = FirebaseAuth.instance.currentUser;
+    log('Get user details');
     print(user?.email);
     print('Login name');
 
-    FirebaseFirestore.instance.collection("users data").doc(user?.uid).get()
-        // .where("userName", isEqualTo: "${user?.email}")
-        // .get()
+    FirebaseFirestore.instance
+        .collection("users data")
+        .doc(user?.uid)
+        .get()
         .then((value) {
-      value.data()!.values.elementAt(0);
-      print(value.data()!.values.elementAt(0));
-      final userPlace = value.data()!.values.elementAt(0);
+      final userPlace = value.get('place');
+      final userName = value.get('name');
+      print('is this the place $userPlace ?');
       provider.changePlace(userPlace);
-
-      //  .forEach((result) {
-      //   print(result.data().values.elementAt(0));
-      //   String newname = result.data().values.elementAt(0);
-      //   // provider.changeShopName(newname);
-      // });
-      print('Got it');
+      print('is this the name $userName ?');
+      provider.changeName(userName);
+      print('user place and name getting');
     });
   }
 }
