@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         ),
         onGenerateRoute: RouteGenerator.getRoute,
         initialRoute: Routes.splashRoute,
-        // home: PhoneNumber(),
+        // home: Introduction(),
       ),
     );
   }

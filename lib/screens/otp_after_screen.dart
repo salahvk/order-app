@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,37 +9,30 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:order/components/color_manager.dart';
 import 'package:order/components/style_manager.dart';
 import 'package:order/constants/colors.dart';
+import 'package:order/main.dart';
 import 'package:order/model/usersData.dart';
 import 'package:order/services/routes_manager.dart';
 import 'package:order/utilis/snackbar.dart';
+import 'package:provider/provider.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({Key? key}) : super(key: key);
+class OtpAfter extends StatefulWidget {
+  const OtpAfter({Key? key}) : super(key: key);
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<OtpAfter> createState() => _OtpAfterState();
 }
 
-class _SignUpState extends State<SignUp> {
-  TextEditingController emailcontroller = TextEditingController();
-  TextEditingController passcontroller = TextEditingController();
+class _OtpAfterState extends State<OtpAfter> {
   TextEditingController namecontroller = TextEditingController();
-  TextEditingController shopcontroller = TextEditingController();
 
   var focusNode = FocusNode();
   bool isPasswordVisible = false;
 
-  String email = "";
-  String password = "";
   List<dynamic> placeNames = [];
   String name = "";
   String? selectedValue;
 
   bool loading = false;
-  bool? uStatus;
-  bool tPin = false;
-  bool pinLoading = false;
-
   List<String?> pNames = [];
 
   @override
@@ -50,11 +45,6 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    void setPsswordVisibility() {
-      setState(() {
-        isPasswordVisible = !isPasswordVisible;
-      });
-    }
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 226, 221, 221),
@@ -78,81 +68,16 @@ class _SignUpState extends State<SignUp> {
                     padding: EdgeInsets.only(
                         top: size.height * 0.11, bottom: size.height * 0.02),
                     child: Text(
-                      'Welcome friend!',
+                      '',
                       style: getRegularStyle(
                           color: ColorManager.background, fontSize: 16),
                     ),
                   ),
                   Text(
-                    'Sign up a new account \nin Order app!',
+                    '',
                     style: getRegularStyle(
                         color: ColorManager.background, fontSize: 12),
                     textAlign: TextAlign.center,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: size.height * 0.04, bottom: size.height * 0.02),
-                    child: Container(
-                      height: size.height * 0.06,
-                      decoration: BoxDecoration(
-                          color: ColorManager.whiteText,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: TextField(
-                            controller: emailcontroller,
-                            onSubmitted: (value) {
-                              FocusScope.of(context).requestFocus(focusNode);
-                            },
-                            onChanged: (value) {},
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Enter your Email',
-                                hintStyle: getRegularStyle(
-                                    color: ColorManager.grayDark,
-                                    fontSize: 12)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: size.height * 0.02),
-                    child: Container(
-                      height: size.height * 0.06,
-                      decoration: BoxDecoration(
-                          color: ColorManager.whiteText,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: Center(
-                          child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 8.0,
-                        ),
-                        child: TextField(
-                          onSubmitted: (value) {
-                            FocusScope.of(context).requestFocus(focusNode);
-                          },
-                          controller: passcontroller,
-                          obscureText: !isPasswordVisible,
-                          decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                  icon: Icon(
-                                    isPasswordVisible
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
-                                  onPressed: () {
-                                    setPsswordVisibility();
-                                  }),
-                              border: InputBorder.none,
-                              hintText: 'Password',
-                              hintStyle: getRegularStyle(
-                                  color: ColorManager.grayDark, fontSize: 12)),
-                        ),
-                      )),
-                    ),
                   ),
 
                   // ? Your name field start
@@ -247,7 +172,7 @@ class _SignUpState extends State<SignUp> {
                               const BorderRadius.all(Radius.circular(10))),
                       child: Center(
                         child: loading == false
-                            ? Text("Sign Up",
+                            ? Text("Next",
                                 style: TextStyle(
                                     fontSize: size.height / 51,
                                     fontFamily: "Open",
@@ -386,70 +311,54 @@ class _SignUpState extends State<SignUp> {
   }
 
   Future onsubmitted() async {
-    email = emailcontroller.text.trim();
-    password = passcontroller.text.trim();
     name = namecontroller.text;
     print("On submit function initiated");
 
-    bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(email);
-    print('$emailValid emailValid');
-
-    if (email.isEmpty || email.length < 4 || emailValid != true) {
-      showSnackBar("Enter a valid Email", context,
-          icon: Icons.email, color: Colors.white);
-    } else if (password.isEmpty || password.length < 6) {
-      showSnackBar("Password must be 6 Characters", context,
-          icon: Icons.email, color: Colors.white);
+    if (selectedValue == null) {
+      showSnackBar("Select Your Location", context,
+          icon: Icons.place, color: Colors.white);
+      return;
     } else if (name.length < 0) {
       showSnackBar("Enter your name", context,
           icon: Icons.person, color: Colors.white);
-      return;
-    } else if (selectedValue == null) {
-      showSnackBar("Select Your Location", context,
-          icon: Icons.place, color: Colors.white);
       return;
     } else {
       setState(() {
         loading = true;
       });
 
+      final authUser = FirebaseAuth.instance.currentUser;
+      final userPhoneNo = authUser?.phoneNumber;
+      final userUid = authUser?.uid;
+
+      log(userPhoneNo!);
+      log(userUid!);
       try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailcontroller.text, password: passcontroller.text);
-        showSnackBar("Account created Successfully", context,
-            icon: Icons.email, color: Colors.white);
-        print('success');
-
-        final authUser = FirebaseAuth.instance.currentUser;
-
         // * Enter data into firestore
-        final docUser = FirebaseFirestore.instance
-            .collection('users data')
-            .doc(authUser?.uid);
+        final docUser =
+            FirebaseFirestore.instance.collection('users data').doc(userUid);
         final user = Users(
-            email: email, id: authUser!.uid, name: name, place: selectedValue);
+            email: userPhoneNo,
+            id: authUser!.uid,
+            name: name,
+            place: selectedValue);
         final json = user.tojson();
         try {
           await docUser.set(json);
+          showSnackBar("Account created Successfully", context,
+              icon: Icons.phone_android, color: Colors.white);
+          print('Account created Successfully');
         } on Exception {
           print('Some exception occured');
         }
-
-        Navigator.pushReplacementNamed(context, Routes.signInRoute);
+        await getUserDetails();
+        Navigator.pushReplacementNamed(context, Routes.shopList);
 
         loading = false;
       } on FirebaseAuthException catch (e) {
         setState(() {
           loading = false;
         });
-        print(e.code);
-        if (e.code == 'email-already-in-use') {
-          showSnackBar(
-              "The email address is already in use by another account", context,
-              icon: Icons.email, color: Colors.white);
-        }
         print(e.message);
       }
     }
@@ -463,5 +372,27 @@ class _SignUpState extends State<SignUp> {
     placeNames = querySnapshot.docs.map((doc) => doc.get('place')).toList();
     print(placeNames);
     return;
+  }
+
+  getUserDetails() async {
+    final provider = Provider.of<Data>(context, listen: false);
+    final user = FirebaseAuth.instance.currentUser;
+    log('Get user details');
+    print(user?.phoneNumber);
+    print('Login number');
+
+    await FirebaseFirestore.instance
+        .collection("users data")
+        .doc(user?.uid)
+        .get()
+        .then((value) {
+      final userPlace = value.get('place');
+      final userName = value.get('name');
+      print('is this the place $userPlace ?');
+      provider.changePlace(userPlace);
+      print('is this the name $userName ?');
+      provider.changeName(userName);
+      print('user place and name getting');
+    });
   }
 }

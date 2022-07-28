@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
                   end: Alignment.bottomRight)),
         ),
         elevation: 0,
-        title: Text('${user?.email}. '),
+        title: Text(provider.personName),
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         actions: [

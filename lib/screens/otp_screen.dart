@@ -1,12 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:multi_state_button/multi_state_button.dart';
 import 'package:order/components/color_manager.dart';
 import 'package:order/components/style_manager.dart';
+import 'package:order/main.dart';
 import 'package:order/services/routes_manager.dart';
 import 'package:order/utilis/snackbar.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
 import 'package:slide_countdown/slide_countdown.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -28,6 +31,9 @@ class _OtpScreenState extends State<OtpScreen> {
   String? verificationId;
   String verificationcode = '';
   bool smsReceived = false;
+  bool? pinVerified;
+  bool userNameAv = false;
+
   final defaultPinTheme = PinTheme(
     width: 46,
     height: 46,
@@ -126,7 +132,9 @@ class _OtpScreenState extends State<OtpScreen> {
                             print(value.credential);
                             print(value.hashCode);
                             print('Pass to home');
-                            Navigator.pushNamed(context, Routes.shopList);
+                            setState(() {
+                              pinVerified = true;
+                            });
                           }
                         });
                       } catch (e) {
@@ -135,6 +143,12 @@ class _OtpScreenState extends State<OtpScreen> {
                             icon: Icons.format_list_numbered_outlined,
                             color: Colors.red);
                       }
+                      pinVerified == true ? await getUserDetails() : null;
+                      userNameAv
+                          ? Navigator.pushNamedAndRemoveUntil(
+                              context, Routes.shopList, (route) => false)
+                          : Navigator.pushReplacementNamed(
+                              context, Routes.otpAfter);
                     },
                     androidSmsAutofillMethod:
                         AndroidSmsAutofillMethod.smsRetrieverApi,
@@ -280,4 +294,42 @@ class _OtpScreenState extends State<OtpScreen> {
         });
   }
   //*  phone number authentication end
+
+  getUserDetails() async {
+    final provider = Provider.of<Data>(context, listen: false);
+    final user = FirebaseAuth.instance.currentUser;
+    print('Get user details');
+    print(user?.phoneNumber);
+    print('Login number');
+    print(user?.uid);
+
+    try {
+      print('user place and name getting');
+
+      await FirebaseFirestore.instance
+          .collection("users data")
+          .where("email", isEqualTo: "${user?.phoneNumber}")
+          .get()
+          .then((value) {
+        value.docs.forEach((result) {
+          print(result.get('name'));
+          final userName = result.get('name');
+          final place = result.get('place');
+          if (userName != null) {
+            print("username not null");
+            provider.changePlace(place);
+
+            setState(() {
+              userNameAv = true;
+            });
+          } else {
+            print("username is null");
+          }
+        });
+      });
+      print('user place and name ended');
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
 }

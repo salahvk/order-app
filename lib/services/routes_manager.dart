@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:order/screens/home_page.dart';
 import 'package:order/screens/introduction.dart';
+import 'package:order/screens/otp_after_screen.dart';
 import 'package:order/screens/phone_number.dart';
 import 'package:order/screens/shop_list.dart';
 import 'package:order/screens/sign_up.dart';
@@ -15,6 +16,7 @@ class Routes {
   static const String signInRoute = '/signIn';
   static const String signUpRoute = '/signUp';
   static const String phoneNumber = '/phoneNumber';
+  static const String otpAfter = '/otpAfter';
   static const String placeMenu = '/PlaceMenu';
   static const String data = '/data';
   static const String dataEntry = '/dataEntry';
@@ -35,6 +37,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const SignIn());
       case Routes.signUpRoute:
         return MaterialPageRoute(builder: (_) => const SignUp());
+      case Routes.otpAfter:
+        return MaterialPageRoute(builder: (_) => const OtpAfter());
       case Routes.shopList:
         return MaterialPageRoute(builder: (_) => ShopList());
       case Routes.phoneNumber:

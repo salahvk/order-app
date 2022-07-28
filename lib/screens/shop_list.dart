@@ -108,6 +108,7 @@ class _ShopListState extends State<ShopList> {
                               shopName = name[index];
                               createChat();
                             },
+                            splashColor: ColorManager.primary,
                             child: Container(
                               // width: 300,
                               height: size.height / 10,
