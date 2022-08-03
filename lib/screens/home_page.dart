@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
+        // toolbarHeight: 200,
         flexibleSpace: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -51,14 +52,6 @@ class _HomePageState extends State<HomePage> {
                       }));
                     },
                     icon: Icon(FontAwesomeIcons.message)),
-                // IconButton(
-                //     onPressed: () {
-                //       FirebaseAuth.instance.signOut();
-                //       Navigator.pushReplacementNamed(
-                //           context, Routes.introduction);
-
-                //     },
-                //     icon: Icon(Icons.logout)),
               ],
             ),
           )

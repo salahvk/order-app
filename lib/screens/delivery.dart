@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class Delivery extends StatelessWidget {
   const Delivery({Key? key}) : super(key: key);
@@ -9,7 +7,7 @@ class Delivery extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('data'),
+        child: Text('Work on Progress'),
       ),
     );
   }

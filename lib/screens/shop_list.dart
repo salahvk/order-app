@@ -158,7 +158,7 @@ class _ShopListState extends State<ShopList> {
   }
 
   createChat() async {
-    // final provider = Provider.of<Data>(context, listen: false);
+    final provider = Provider.of<Data>(context, listen: false);
     final user = FirebaseAuth.instance.currentUser;
     final docMsg = FirebaseFirestore.instance
         .collection('places')
@@ -187,7 +187,7 @@ class _ShopListState extends State<ShopList> {
         .collection('rooms')
         .doc(user?.uid);
 
-    final userMail = UserMail(name: user?.email, Uid: user?.uid);
+    final userMail = UserMail(name: provider.personName, Uid: user?.uid);
     // final userMail = {"name": user?.email};
     try {
       await docEmail.set(userMail.tojson());
